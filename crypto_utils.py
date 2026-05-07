@@ -18,7 +18,7 @@ def b64encodeString(toEncode: bytes) -> str:
 
 
 def b64decodeString(toDecode: str) -> bytes:
-    if isinstance(toDecode, str):
+    if not isinstance(toDecode, str):
         raise TypeError("b64decodeString takes a string as input")
     return b64d(bytes(toDecode, "utf-8"))
 

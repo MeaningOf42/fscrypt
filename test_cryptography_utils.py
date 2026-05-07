@@ -1,4 +1,4 @@
-from cryptography_utils import (
+from crypto_utils import (
     decryptStringFromPassword,
     encryptStringFromPassword,
     b64decodeString,
