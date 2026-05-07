@@ -10,7 +10,7 @@ import random
 import string
 
 
-b64Chars = "0123456789+-abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWZXYZ"
+b64Chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_"
 
 
 def create_random_string(
@@ -28,9 +28,10 @@ class TestB64StringUtils(unittest.TestCase):
 
     def test_decode_encode(self) -> None:
         """Checks that you can decode then encode a string and end up with the same string"""
-        testString: str = "".join([random.choice(b64Chars) for i in range(16)])
-        decodeEncode: str = b64encodeString(b64decodeString(testString))
-        self.assertEqual(testString, decodeEncode)
+        for i in range(100):
+            testString: str = "".join([random.choice(b64Chars) for i in range(16)])
+            decodeEncode: str = b64encodeString(b64decodeString(testString))
+            self.assertEqual(testString, decodeEncode)
 
 
 class TestPasswordEncryptionDecryption(unittest.TestCase):
