@@ -1,10 +1,22 @@
-from cryptography_utils import b64encodeString, b64decodeString
+from cryptography_utils import (
+    decryptStringFromPassword,
+    encryptStringFromPassword,
+    b64decodeString,
+    b64encodeString,
+)
 import unittest
 import os
 import random
+import string
 
 
 b64Chars = "0123456789+-abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWZXYZ"
+
+
+def create_random_string(
+    length: int, alphabet=string.ascii_letters + string.digits
+) -> str:
+    return "".join([random.choice(alphabet) for _ in range(length)])
 
 
 class TestB64StringUtils(unittest.TestCase):
@@ -22,13 +34,28 @@ class TestB64StringUtils(unittest.TestCase):
 
 
 class TestPasswordEncryptionDecryption(unittest.TestCase):
-    pass
+    def testEncryptDecript(self):
+        password: str = create_random_string(10)
+        secretMessage: str = f"""
+
+Dear bob,
+
+this is my secret message to confess my love to you! also here is a random string {create_random_string(10)}.
+
+Yours faithfully,
+
+Alice
+
+"""
+        encryptedMessage: str = encryptStringFromPassword(secretMessage, password)
+        decryptedMessage: str = decryptStringFromPassword(encryptedMessage, password)
+        self.assertEqual(secretMessage, decryptedMessage)
 
 
 class TestExceptions(unittest.TestCase):
     def testB64DecodeStringThrowsTypeError(self):
-        """Checks that b64decode string throws error as"""
-        with self.assertRaises(RuntimeError):
+        """Checks that b64decode string throws error as Runtime Error"""
+        with self.assertRaises(TypeError):
             b64decodeString(os.urandom(16))
 
 

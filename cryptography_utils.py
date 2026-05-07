@@ -18,10 +18,13 @@ def b64encodeString(toEncode: bytes) -> str:
 
 
 def b64decodeString(toDecode: str) -> bytes:
-    return b64d(toDecode.encode("utf-8"))
+    if isinstance(toDecode, str):
+        raise TypeError("b64decodeString takes a string as input")
+    return b64d(bytes(toDecode, "utf-8"))
 
 
-SALT_STR_LEN = len(os.urandom(16))
+SALT_BYTES_LEN = 16
+SALT_STR_LEN = len(b64encodeString(os.urandom(SALT_BYTES_LEN)))
 
 
 def genKeyFromPasswordAndSalt(password: str, salt: bytes) -> bytes:
@@ -31,15 +34,17 @@ def genKeyFromPasswordAndSalt(password: str, salt: bytes) -> bytes:
         salt=salt,
         iterations=KEY_DERIVE_ITERATIONS,
     )
-    return kdf.derive(b64decodeString(password))
+    return kdf.derive(password.encode("utf-8"))
 
 
 def encryptStringFromPassword(stringToEncrypt: str, password: str) -> str:
-    salt: bytes = os.urandom(16)
+    salt: bytes = os.urandom(SALT_BYTES_LEN)
     saltString = b64encodeString(salt)
     key: bytes = genKeyFromPasswordAndSalt(password, salt)
-    bytesToEncrypt: bytes = b64decodeString(stringToEncrypt)
-    encryptedMessageString: str = b64encodeString(Fernet(key).encrypt(bytesToEncrypt))
+    bytesToEncrypt: bytes = stringToEncrypt.encode("utf-8")
+    encryptedMessageString: str = b64encodeString(
+        Fernet(b64e(key)).encrypt(bytesToEncrypt)
+    )
     return saltString + encryptedMessageString
 
 
@@ -48,4 +53,4 @@ def decryptStringFromPassword(encryptedString: str, password: str) -> str:
     salt: bytes = b64decodeString(encryptedString[:SALT_STR_LEN])
     key: bytes = genKeyFromPasswordAndSalt(password, salt)
 
-    return b64encodeString(Fernet(key).decrypt(encryptedMessage))
+    return Fernet(b64e(key)).decrypt(encryptedMessage).decode("utf-8")
