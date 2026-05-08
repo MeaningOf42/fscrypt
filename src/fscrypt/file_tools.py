@@ -1,9 +1,12 @@
 from . import crypto_utils
 from typing import Callable
 import os
+from pathlib import Path
 
 
-def map_file(oldPath: str, newPath: str, function: Callable[[str], str]) -> None:
+def map_file(
+    oldPath: str | Path, newPath: str | Path, function: Callable[[str], str]
+) -> None:
     # Read the old file
     with open(oldPath, "r") as oldFile:
         oldFileText: str = oldFile.read()
@@ -16,7 +19,11 @@ def map_file(oldPath: str, newPath: str, function: Callable[[str], str]) -> None
         newFile.write(encryptedText)
 
 
-def map_dir(inputDirectory: str, outputDirectory: str, function: Callable[[str], str]):
+def map_dir(
+    inputDirectory: str | Path,
+    outputDirectory: str | Path,
+    function: Callable[[str], str],
+):
     # Runs checks sanity checks on inputs
     if not os.path.exists(inputDirectory):
         raise RuntimeError(
@@ -58,7 +65,7 @@ def strip_commenting(commented_line: str) -> str:
     return commented_line
 
 
-def encrypt_file_text_from_answer(input_text: str) -> str:
+def encrypt_file_text_from_last_line(input_text: str) -> str:
     """split text into first and last lines and use last line to encrypt others"""
     lines: list[str] = input_text.split("\n")
     body: str = "\n".join(lines[:-1])
@@ -68,4 +75,4 @@ def encrypt_file_text_from_answer(input_text: str) -> str:
 
 
 def encrypt_all_files_in_dir(inputDirectory: str, outputDirectory: str):
-    map_dir(inputDirectory, outputDirectory, encrypt_file_text_from_answer)
+    map_dir(inputDirectory, outputDirectory, encrypt_file_text_from_last_line)

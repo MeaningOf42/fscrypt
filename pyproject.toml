@@ -19,7 +19,7 @@ test = [
 ]
 
 [project.scripts]
-fscrypt = "fscrypt.main:main"
+fscrypt = "fscrypt.cli:app"
 
 [tool.setuptools.packages.find]
 where = ["src"]
