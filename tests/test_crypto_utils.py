@@ -1,4 +1,4 @@
-from fsencrypt.crypto_utils import (
+from fscrypt.crypto_utils import (
     decryptStringFromPassword,
     encryptStringFromPassword,
     b64decodeString,

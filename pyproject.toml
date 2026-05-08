@@ -1,25 +1,25 @@
 [build-system]
-requires = ["setuptools>=69", "wheel"]
 build-backend = "setuptools.build_meta"
+requires = ["setuptools>=69", "wheel"]
 
 [project]
-name = "fsencrypt"
-version = "0.1.0"
-description = "Tools for encrypting and decrypting text files"
-requires-python = ">=3.11"
 dependencies = [
-    "cryptography",
-    "typer",
+  "cryptography",
+  "typer",
 ]
+description = "Tools for encrypting and decrypting text files"
+name = "fscrypt"
+requires-python = ">=3.11"
+version = "0.1.0"
 
 [project.optional-dependencies]
 test = [
-    "pytest",
-    "pyfakefs",
+  "pytest",
+  "pyfakefs",
 ]
 
 [project.scripts]
-fsencrypt = "fsencrypt.main:main"
+fsencrypt = "fscrypt.main:main"
 
 [tool.setuptools.packages.find]
 where = ["src"]

@@ -1,8 +1,8 @@
 from pathlib import Path
 from pyfakefs.fake_filesystem import FakeFilesystem
 
-import fsencrypt.file_tools as file_tools
-import fsencrypt.crypto_utils as crypto_utils
+import fscrypt.file_tools as file_tools
+import fscrypt.crypto_utils as crypto_utils
 
 
 def fake_encryption(plaintext: str) -> str:
