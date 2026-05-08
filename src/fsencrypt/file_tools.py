@@ -1,4 +1,4 @@
-import crypto_utils
+from . import crypto_utils
 from typing import Callable
 import os
 

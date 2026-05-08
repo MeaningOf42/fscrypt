@@ -3,7 +3,7 @@ encryptedFolder = "write-ups-encrypted"
 
 
 def main():
-    pass
+    print("App not yet implemented")
 
 
 if __name__ == "__main__":

@@ -1,3 +1,10 @@
-env/
+*.egg-info/
+build/
+dist/
 __pycache__/
-desktop.ini
+.pytest_cache/
+.venv/
+env/
+desktop.ini/
+.ruff_cache/
+.mypy_cache/
