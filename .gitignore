@@ -8,3 +8,4 @@ env/
 desktop.ini/
 .ruff_cache/
 .mypy_cache/
+write_ups/

@@ -7,16 +7,10 @@ from fscrypt.crypto_utils import (
 import unittest
 import os
 import random
-import string
+from testing_utils import create_random_string
 
 
 b64Chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_"
-
-
-def create_random_string(
-    length: int, alphabet=string.ascii_letters + string.digits
-) -> str:
-    return "".join([random.choice(alphabet) for _ in range(length)])
 
 
 class TestB64StringUtils(unittest.TestCase):
