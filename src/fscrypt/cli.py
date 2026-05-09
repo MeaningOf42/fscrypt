@@ -1,9 +1,8 @@
 from pathlib import Path
-from typing import Annotated, Callable
+from typing import Annotated
 
 import typer
 
-from . import crypto_utils
 from . import file_tools
 
 app = typer.Typer(help="Encrypt and decrypt text files.")
@@ -27,24 +26,20 @@ def encrypt_file(
 
     If --password is omitted, the final line of the input file is used as the password.
     """
+    # Creates the parent directory of the output file
+    output_file.parent.mkdir(parents=True, exist_ok=True)
 
-    # Create a encryption function that either uses the last line of text, or password if password is given
-    encryption_function: Callable[[str], str]
+    # If there is a password create a encrypted file using it, if not encrypt using the last line of the file
     if password is None:
-        encryption_function = file_tools.encrypt_file_text_from_last_line
+        file_tools.encrypt_file_from_last_line(input_file, output_file)
     else:
         given_password: str = password
+        file_tools.encrypt_file_from_password(input_file, output_file, given_password)
 
-        def encryption_function(plaintext: str) -> str:
-            return crypto_utils.encryptStringFromPassword(plaintext, given_password)
-
-    output_file.parent.mkdir(parents=True, exist_ok=True)
-    file_tools.map_file(input_file, output_file, encryption_function)
-
+    # Prints out a message saying what file was encrypted and using what password:
     password_explaination: str = "the last line in in the file"
     if password is not None:
         password_explaination = password
-
     typer.echo(
         f"Encrypted {input_file} -> {output_file} using {password_explaination} as the password"
     )
@@ -62,8 +57,21 @@ def encrypt_dir(
         Path,
         typer.Argument(help="output directory where encrypted files will be placed"),
     ],
+    password: Annotated[
+        str | None,
+        typer.Option(
+            "--password",
+            "-p",
+            help="Password to use. If ommited the last line of each file is used",
+        ),
+    ] = None,
 ) -> None:
-    "Recreate structure of input directory in output director, but every file is encrypted" " with the last line of text used as a password."
-    file_tools.map_dir(
-        input_directory, output_directory, file_tools.encrypt_file_text_from_last_line
-    )
+    "Recreate structure of input directory in output director, but every file is encrypted with the last line of text used as a password."
+    if password is None:
+        file_tools.encrypt_files_in_dir_from_last_lines(
+            input_directory, output_directory
+        )
+    else:
+        file_tools.encrypt_files_in_dir_from_password(
+            input_directory, output_directory, password
+        )
