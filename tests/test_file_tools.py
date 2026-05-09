@@ -29,15 +29,61 @@ def test_map_dir_transforms_nested_dir(fs: FakeFilesystem) -> None:
         assert (Path("/encrypted_dir") / path).read_text() == fake_encryption(contents)
 
 
-def test_encrypt_all_files_in_dir_with_fake_dir(fs: FakeFilesystem) -> None:
+def test_encrypt_file_with_last_line(fs: FakeFilesystem) -> None:
+    body: str = "Dear alice, u up? - Bob"
+    password: str = "aljfSLK£nc3&yvHSnk?"
+    plainPath: Path = Path("/plain.txt")
+    cryptPath: Path = Path("/crypt.txt")
+
+    fs.create_file(plainPath, contents=body + "\n" + password)
+    file_tools.encrypt_file_from_last_line(plainPath, cryptPath)
+
+    assert cryptPath.exists()
+    assert (
+        crypto_utils.decryptStringFromPassword(cryptPath.read_text(), password) == body
+    )
+
+
+def test_encrypt_file_with_password(fs: FakeFilesystem) -> None:
+    body: str = "Dear alice, u up? - Bob"
+    password: str = "aljfSLK£nc3&yvHSnk?"
+    plainPath: Path = Path("/plain.txt")
+    cryptPath: Path = Path("/crypt.txt")
+
+    fs.create_file(plainPath, contents=body)
+    file_tools.encrypt_file_from_password(plainPath, cryptPath, password)
+
+    assert cryptPath.exists()
+    assert (
+        crypto_utils.decryptStringFromPassword(cryptPath.read_text(), password) == body
+    )
+
+
+def test_encrypt_all_files_in_dir_with_last_line(fs: FakeFilesystem) -> None:
     for path, contents, password in PLAINTEXT_TEST_FILES:
         fs.create_file(
             Path("/plaintext_dir") / path, contents=contents + "\n" + password
         )
 
-    file_tools.encrypt_all_files_in_dir("/plaintext_dir", "/encrypted_dir")
+    file_tools.encrypt_files_in_dir_from_last_lines("/plaintext_dir", "/encrypted_dir")
 
     for path, contents, password in PLAINTEXT_TEST_FILES:
+        encrypted: str = (Path("/encrypted_dir") / path).read_text()
+        decrypted: str = crypto_utils.decryptStringFromPassword(encrypted, password)
+        assert decrypted == contents
+
+
+def test_encrypt_all_files_in_dir_with_password(fs: FakeFilesystem) -> None:
+    for path, contents, _ in PLAINTEXT_TEST_FILES:
+        fs.create_file(Path("/plaintext_dir") / path, contents=contents)
+
+    password: str = "COMMON_PASSWORD"
+
+    file_tools.encrypt_files_in_dir_from_password(
+        "/plaintext_dir", "/encrypted_dir", password
+    )
+
+    for path, contents, _ in PLAINTEXT_TEST_FILES:
         encrypted: str = (Path("/encrypted_dir") / path).read_text()
         decrypted: str = crypto_utils.decryptStringFromPassword(encrypted, password)
         assert decrypted == contents

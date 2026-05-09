@@ -25,7 +25,7 @@ def test_encrypt_file_with_pass_e2e(tmp_path: Path):
     assert "Encrypted" in result.stdout
 
 
-def test_encrypt_file_with_no_pass_e2e(tmp_path: Path):
+def test_encrypt_file_with_last_line_e2e(tmp_path: Path):
     password: str = "S3cur3P4ss123!"
     plaintext: str = "secrete message from alice to bob"
     body: str = plaintext + "\n" + password
@@ -41,7 +41,31 @@ def test_encrypt_file_with_no_pass_e2e(tmp_path: Path):
     assert "Encrypted" in result.stdout
 
 
-def test_encrypt_dir_recursive_e2e(tmp_path: Path):
+def test_encrypt_dir_with_password_e2e(tmp_path: Path):
+    password: str = "FakePass18fdsjnK"
+    for filepath, plaintext, _ in PLAINTEXT_TEST_FILES:
+        filebody: str = plaintext
+        full_filepath: Path = tmp_path / "plain_dir" / filepath
+        full_filepath.parent.mkdir(parents=True, exist_ok=True)
+        full_filepath.write_text(filebody)
+
+    run_cli(
+        "encrypt-dir",
+        str(tmp_path / "plain_dir"),
+        str(tmp_path / "crypt_dir"),
+        "-p",
+        password,
+    )
+
+    for path, contents, _ in PLAINTEXT_TEST_FILES:
+        full_filepath = tmp_path / "crypt_dir" / path
+        assert full_filepath.exists()
+        encrypted: str = full_filepath.read_text()
+        decrypted: str = decryptStringFromPassword(encrypted, password)
+        assert decrypted == contents
+
+
+def test_encrypt_dir_with_last_line_e2e(tmp_path: Path):
     for filepath, plaintext, password in PLAINTEXT_TEST_FILES:
         filebody: str = plaintext + "\n" + password
         full_filepath: Path = tmp_path / "plain_dir" / filepath

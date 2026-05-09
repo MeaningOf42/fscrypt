@@ -74,5 +74,30 @@ def encrypt_file_text_from_last_line(input_text: str) -> str:
     return outputText
 
 
-def encrypt_all_files_in_dir(inputDirectory: str, outputDirectory: str):
+def encryptor_from_password(password: str) -> Callable[[str], str]:
+    def encrypt_with_curried_password(plaintext: str) -> str:
+        return crypto_utils.encryptStringFromPassword(plaintext, password)
+
+    return encrypt_with_curried_password
+
+
+def encrypt_file_from_last_line(inputFile: str | Path, outputFile: str | Path) -> None:
+    map_file(inputFile, outputFile, encrypt_file_text_from_last_line)
+
+
+def encrypt_file_from_password(
+    inputFile: str | Path, outputFile: str | Path, password: str
+) -> None:
+    map_file(inputFile, outputFile, encryptor_from_password(password))
+
+
+def encrypt_files_in_dir_from_last_lines(
+    inputDirectory: str | Path, outputDirectory: str | Path
+) -> None:
     map_dir(inputDirectory, outputDirectory, encrypt_file_text_from_last_line)
+
+
+def encrypt_files_in_dir_from_password(
+    inputDirectory: str | Path, outputDirectory: str | Path, password: str
+) -> None:
+    map_dir(inputDirectory, outputDirectory, encryptor_from_password(password))
